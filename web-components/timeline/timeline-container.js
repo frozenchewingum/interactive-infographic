@@ -44,16 +44,42 @@ class TimelineContainer extends HTMLElement {
             width: 100px;
             aspect-ratio: 1;
         }
-            .highlight {
-                background: none;
-                color: red;
-                text-shadow: 0 0 4px #ff0000;
-                font-size: 40px;
-            }
-        @media (min-width: 768px) {
-            .timeline {
-            }
+        .highlight {
+            background: none;
+            color: red;
+            text-shadow: 0 0 4px #ff0000;
+            font-size: 40px;
         }
+
+        @media (max-width: 600px) {
+          :host {
+          }
+          .timeline {
+            gap: 5px;
+            width: 90%;
+            justify-content: flex-start;
+          }
+
+          #name {
+            font-size: 16px;
+          }
+
+        }
+          
+        @media (min-width: 601px) and (max-width: 1024px) {
+          :host {
+          }
+          .timeline {
+            gap: 10px;
+            width: 85%;
+            justify-content: flex-start;
+          }
+            
+          #name {
+            font-size: 16px;
+          }
+        }
+
     </style>
     <section id="${id}" class="timeline">
         <div id="name"></div>

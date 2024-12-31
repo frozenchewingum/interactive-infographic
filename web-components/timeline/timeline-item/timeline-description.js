@@ -6,6 +6,7 @@ class TimelineDescription extends HTMLElement {
     this.timelineId = this.getAttribute("timelineId");
     this.phone = phone.find((item) => item.timelineId === this.timelineId);
     this.descriptionTyped = null;
+    this.md = new MobileDetect(window.navigator.userAgent);
   }
 
   connectedCallback() {
@@ -31,13 +32,34 @@ class TimelineDescription extends HTMLElement {
             transition: width 5s ease;
           }
 
-        #highlight:not(.revealed) {
-            cursor: pointer;
-        }
+          #highlight:not(.revealed) {
+              cursor: pointer;
+          }
 
-        #highlight:not(.revealed):hover {
-            font-weight: bold;
-        }
+          #highlight:not(.revealed):hover {
+              font-weight: bold;
+          }
+
+          @media (max-width: 600px) {
+            #wrapper {
+              font-size: 12px;
+              line-height: 20px;
+            }
+            .glow, #highlight {
+              display: unset;
+            }
+
+          }
+    
+          @media (min-width: 601px) and (max-width: 1024px) {
+            #wrapper {
+              font-size: 16px;
+              line-height: 20px;
+            }
+            .glow, #highlight {
+              display: unset;
+            }
+          }
 
         </style>
         <div id="wrapper">
@@ -52,7 +74,7 @@ class TimelineDescription extends HTMLElement {
     const descriptionEl = this.shadowRoot.getElementById("description");
     const wrapperEl = this.shadowRoot.getElementById("wrapper");
     const component = this;
-    const highlightElWidth = this.calculateTextWidth(this.phone.highlight);
+    const highlightElWidth = this.calculateTextWidth(this.phone.highlight, this.md.mobile() ? "12px": "20px");
 
     if (this.phone) {
       const highlightValue = this.phone.highlight;

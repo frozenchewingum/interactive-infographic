@@ -45,6 +45,17 @@ class TimelineImage extends HTMLElement {
             display: none;
          }
 
+        @media (max-width: 600px) {
+          #image {
+            height: 25vh;
+          }
+        }
+  
+        @media (min-width: 601px) and (max-width: 1024px) {
+          #image {
+            height: 30vh;
+          }
+        }
 
         </style>
         <div id="image">

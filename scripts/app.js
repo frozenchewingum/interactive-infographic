@@ -1,9 +1,5 @@
 import { phone } from '../data/phone.js';
 
-const state = {
-  currentSection: ''
-}
-
 const createComponents = (data) => {
   const container = document.getElementById('app-container');
   data.forEach(item => {

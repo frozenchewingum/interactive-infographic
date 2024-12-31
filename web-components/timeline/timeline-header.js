@@ -5,6 +5,7 @@ class TimelineHeader extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.observer = null; // Intersection Observer instance
+    this.md = new MobileDetect(window.navigator.userAgent);
   }
 
   connectedCallback() {    
@@ -45,6 +46,46 @@ class TimelineHeader extends HTMLElement {
             display: block;
         }
 
+        @media (max-width: 600px) {
+          header {
+            padding: 0;
+          }
+          #header-content {
+            font-size: 16px;
+          }
+          #year-range {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+          }
+          #currentTimeline {
+            font-size: 24px;
+          }
+          header.minimized {
+            height: 75px;
+          }
+        }
+  
+        @media (min-width: 601px) and (max-width: 1024px) {
+            header {
+              padding: 0;
+            }
+            #header-content {
+              font-size: 16px;
+            }
+            #year-range {
+              display: flex;
+              justify-content: center;
+              gap: 0.5rem;
+            }
+            #currentTimeline {
+              font-size: 24px;
+            }
+            header.minimized {
+              height: 75px;
+            }
+        }
+        
         </style>
         <header>
             <span id="header-content">
@@ -96,7 +137,7 @@ class TimelineHeader extends HTMLElement {
         document.documentElement.style.scrollPaddingTop = '110px';
         anime({
           targets: headerContentEl,
-          fontSize: "14px",
+          fontSize: this.md.mobile ? "12px" :"14px",
           easing: "easeInOutQuad",
           duration: 500,
         });
@@ -111,7 +152,7 @@ class TimelineHeader extends HTMLElement {
         sharedState.setState("currentTimelineId", ''); 
         anime({
           targets: headerContentEl,
-          fontSize: "26px",
+          fontSize: this.md.mobile ? "16px" :"26px",
           easing: "easeInOutQuad",
           duration: 500,
         });
