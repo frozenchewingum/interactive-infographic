@@ -13,5 +13,4 @@ const createComponents = (data) => {
   });
 };
 
-
 createComponents(phone);

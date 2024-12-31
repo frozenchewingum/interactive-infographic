@@ -6,6 +6,9 @@ class TimelineContainer extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.observer = null; // Intersection Observer instance
+    this.descriptionComponent = null;
+    this.directionAnim = null;
+    this.opacityAnim = null
   }
 
   connectedCallback() {
@@ -22,16 +25,21 @@ class TimelineContainer extends HTMLElement {
     <style>
         :host {
             display: block;
-            height: 100vh;
-            padding: 20px;
+            height: calc(100vh - 130px);
+            padding: 10px;
             overflow: hidden;
-            border: 1px solid white;
+            scroll-snap-align: start;
         }
         .timeline {
+            width: 75%;
+            height: 100%;
             display: flex;
+            justify-content: center;
             flex-direction: column;
             align-items: center;
             gap: 20px;
+            margin: 0 auto;
+            opacity: 0;
         }
         .image {
             width: 100px;
@@ -50,11 +58,27 @@ class TimelineContainer extends HTMLElement {
     </style>
     <section id="${id}" class="timeline">
         <timeline-image timelineId=${id}></timeline-image>
+        <timeline-description timelineId=${id}></timeline-description>
     </section>
     `;
 
     // Set up Intersection Observer
     this.initObserver(item);
+    this.initListener();
+    this.initAnimations();
+  }
+
+  initListener() {
+    this.descriptionComponent = this.shadowRoot.querySelector(
+      "timeline-description"
+    );
+    const timelineId = this.getAttribute("data-timeline-id");
+    // Listen to reveal-phone event to reveal description
+    this.addEventListener("reveal-phone", (event) => {
+      if (timelineId === event.detail.timelineId) {
+        this.descriptionComponent.reveal();
+      }
+    });
   }
 
   initObserver(item) {
@@ -67,11 +91,12 @@ class TimelineContainer extends HTMLElement {
     this.observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          console.log(item.timelineId);
-          console.log(entry.target.getAttribute("data-timeline-id"));
           sharedState.setState("currentTimelineId", item.timelineId);
           // Trigger animation when the component enters view
-          this.initAnimations(item.highlight, item.year, item.description);
+          this.playAnimations();
+        } else {
+          // Reset animation when the component leaves view
+          this.resetAnimations();
         }
       });
     }, observerOptions);
@@ -79,25 +104,50 @@ class TimelineContainer extends HTMLElement {
     this.observer.observe(this);
   }
 
-  initAnimations(highlight, year, description) {
-    const elements = this.shadowRoot.querySelectorAll(".title");
-    elements.forEach((el) => {
-      el.style.transform = "translateX(0)";
+  initAnimations() {
+    const timelineId = this.getAttribute("data-timeline-id");
+    const timelineContainerEl = this.shadowRoot.getElementById(timelineId);
+    const randomNumber = Math.floor(Math.random() * 2);
+    const direction = randomNumber === 1 ? "100%" : "-100%";
+    timelineContainerEl.style.transform = `translateX(${direction})`;
+
+    this.directionAnim = anime({
+      targets: timelineContainerEl,
+      translateX: [
+        { value: direction, duration: 250 },
+        { value: "0%", duration: 500 },
+      ],
+      easing: "easeInOutQuad",
+      autoplay: false
     });
 
-    anime({
-      targets: elements,
-      translateX: 270,
+    this.opacityAnim = anime({
+      targets: timelineContainerEl,
+      opacity: [
+        { value: 0, duration: 250 },
+        { value: 0.5, duration: 500 },
+        { value: 1, duration: 500 },
+      ],
+      autoplay: false
     });
+  }
 
-    const yearSpan = this.shadowRoot.querySelectorAll(".timeline .year");
-    anime({
-      targets: yearSpan,
-      innerText: [1900, year],
-      round: 1,
-      easing: "easeInOutExpo",
-      duration: 1000,
-    });
+  playAnimations() {
+    if(this.directionAnim) {
+      this.directionAnim.play();
+    }
+    if(this.opacityAnim) {
+      this.opacityAnim.play();
+    }
+  }
+
+  resetAnimations() {
+    if(this.directionAnim) {
+      this.directionAnim.reset();
+    }
+    if(this.opacityAnim) {
+      this.opacityAnim.reset();
+    }
   }
 
   disconnectedCallback() {

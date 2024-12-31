@@ -1,12 +1,10 @@
 import { phone } from "../../data/phone.js";
 import { sharedState } from "../../scripts/shared-state.js";
-
 class TimelineHeader extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
     this.observer = null; // Intersection Observer instance
-    console.log(sharedState);
   }
 
   connectedCallback() {    
@@ -60,43 +58,6 @@ class TimelineHeader extends HTMLElement {
         </header>
               `;
 
-    const header = this.shadowRoot.querySelector("header");
-    const appContainer = document.getElementById("app-container");
-    const headerContentEl = this.shadowRoot.getElementById("header-content");
-
-    let lastScrollPosition = 0;
-
-    window.addEventListener("scroll", () => {
-      const currentScrollPosition = window.scrollY;
-      if (currentScrollPosition > 110) {
-        // Minimize the header when scrolling down past 100px
-        header.classList.add("minimized");
-        appContainer.classList.add("minimized");
-        document.body.classList.add("minimized");
-        anime({
-          targets: headerContentEl,
-          fontSize: "14px",
-          easing: "easeInOutQuad",
-          duration: 500,
-        });
-      } else if (currentScrollPosition <= 110) {
-        // Restore the header when scrolling up or near the top
-        header.classList.remove("minimized");
-        appContainer.classList.remove("minimized");
-        document.body.classList.remove("minimized");
-        // reset current timeline id
-        sharedState.setState("currentTimelineId", ''); 
-        anime({
-          targets: headerContentEl,
-          fontSize: "26px",
-          easing: "easeInOutQuad",
-          duration: 500,
-        });
-      }
-      lastScrollPosition = currentScrollPosition;
-    });
-
-    this.initListener();
     this.initHeaderAnimation();
   }
 
@@ -119,13 +80,52 @@ class TimelineHeader extends HTMLElement {
     });
   }
 
+  initScrollListener() {
+    const header = this.shadowRoot.querySelector("header");
+    const appContainer = document.getElementById("app-container");
+    const headerContentEl = this.shadowRoot.getElementById("header-content");
+    let lastScrollPosition = 0;
+    window.addEventListener("scroll", () => {
+      const currentScrollPosition = window.scrollY;
+      if (currentScrollPosition > 130) {
+        // Minimize the header when scrolling down past 100px
+        header.classList.add("minimized");
+        appContainer.classList.add("minimized");
+        document.body.classList.add("minimized");
+        document.documentElement.style.scrollSnapType = 'y mandatory';
+        document.documentElement.style.scrollPaddingTop = '110px';
+        anime({
+          targets: headerContentEl,
+          fontSize: "14px",
+          easing: "easeInOutQuad",
+          duration: 500,
+        });
+      } else if (currentScrollPosition <= 130) {
+        // Restore the header when scrolling up or near the top
+        header.classList.remove("minimized");
+        appContainer.classList.remove("minimized");
+        document.body.classList.remove("minimized");
+        document.documentElement.style.scrollSnapType = '';
+        document.documentElement.style.scrollPaddingTop = '';
+        // reset current timeline id
+        sharedState.setState("currentTimelineId", ''); 
+        anime({
+          targets: headerContentEl,
+          fontSize: "26px",
+          easing: "easeInOutQuad",
+          duration: 500,
+        });
+      }
+    });
+  }
+
   initHeaderAnimation() {
+    const component = this;
     const headerTitleEl = this.shadowRoot.getElementById("header-title");
     const yearFromEl = this.shadowRoot.getElementById("year-from");
     const yearToEl = this.shadowRoot.getElementById("year-to");
     const firstPhone = phone[0];
     const lastPhone = phone[phone.length-1];
-
     // Animating from title > year from > year to using typed js and anime js
     var headerTitleTyped = new Typed(headerTitleEl, {
       strings: ["The Evolution of Mobile Phones"],
@@ -159,6 +159,14 @@ class TimelineHeader extends HTMLElement {
                         round: 1,
                         easing: "easeInOutExpo",
                         duration: 1000,
+                        complete: function(anim) {
+                          if(anim.completed) {
+                            // enable scrolling
+                            document.documentElement.style.overflow = 'overlay';
+                            component.initScrollListener();
+                            component.initListener();
+                          }
+                        }
                       });
                     },
                   });

@@ -49,6 +49,7 @@ class TimelineImage extends HTMLElement {
         </style>
         <div id="image">
             <span id="question">?</span>
+            <span></span>
         </div>
               `;
 
@@ -60,6 +61,7 @@ class TimelineImage extends HTMLElement {
     var isRevealed = false;
     const imageEl = this.shadowRoot.getElementById("image");
     const questionEl = this.shadowRoot.getElementById("question");
+    const component = this;
     var animation = anime({
       targets: questionEl,
       rotateZ: [0, 30, -30, 30, -30, 0],
@@ -95,6 +97,13 @@ class TimelineImage extends HTMLElement {
           imageEl.classList.add("revealed");
           imageEl.style.backgroundColor = "transparent";
           revealImageMovementAnimation.reset();
+          component.dispatchEvent(
+            new CustomEvent("reveal-phone", {
+              detail: { timelineId: timelineId },
+              bubbles: true,
+              composed: true,
+            })
+          );
         }
       },
     });
