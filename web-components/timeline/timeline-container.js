@@ -6,21 +6,20 @@ class TimelineContainer extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this.observer = null; // Intersection Observer instance
+    this.nameEl = null;
     this.descriptionComponent = null;
     this.directionAnim = null;
-    this.opacityAnim = null
+    this.opacityAnim = null;
+    this.phone = phone.find(
+      (item) => item.timelineId === this.getAttribute("data-timeline-id")
+    );
   }
 
   connectedCallback() {
-    const item = phone.find(
-      (item) => item.timelineId === this.getAttribute("data-timeline-id")
-    );
-    const id = item.timelineId;
-    const imageUrl = item ? item.timelineId + ".png" : "";
-    const description = item ? item.description : "";
-    const year = item ? item.year : "";
-    const highlight = item ? item.highlight : null;
-
+    const id = this.phone.timelineId;
+    if(id === phone[0].timelineId) {
+      this.scrollIntoView();
+    }
     this.shadowRoot.innerHTML = `
     <style>
         :host {
@@ -57,13 +56,14 @@ class TimelineContainer extends HTMLElement {
         }
     </style>
     <section id="${id}" class="timeline">
+        <div id="name"></div>
         <timeline-image timelineId=${id}></timeline-image>
         <timeline-description timelineId=${id}></timeline-description>
     </section>
     `;
 
     // Set up Intersection Observer
-    this.initObserver(item);
+    this.initObserver(this.phone);
     this.initListener();
     this.initAnimations();
   }
@@ -72,11 +72,18 @@ class TimelineContainer extends HTMLElement {
     this.descriptionComponent = this.shadowRoot.querySelector(
       "timeline-description"
     );
+    this.nameEl = this.shadowRoot.getElementById("name");
+    const phoneName = this.phone.name;
     const timelineId = this.getAttribute("data-timeline-id");
     // Listen to reveal-phone event to reveal description
     this.addEventListener("reveal-phone", (event) => {
       if (timelineId === event.detail.timelineId) {
         this.descriptionComponent.reveal();
+        var nameTyped = new Typed(this.nameEl, {
+          strings: [phoneName],
+          cursorChar: "",
+          typeSpeed: 30
+        })
       }
     });
   }
