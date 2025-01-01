@@ -105,3 +105,9 @@ export const phone = [
 - All events are hardcoded in the `data.js` file; they cannot be dynamically changed without modifying the code.
 - No fallback for browsers without Web Component support.
 - Static events unless dynamically updated via JavaScript.
+
+### References
+- [The Evolution of Mobile Phones](https://flauntdigital.com/blog/evolution-mobile-phones/#content_4)
+
+### Demo
+- [Live Demo](https://relaxed-khapse-928605.netlify.app/)
